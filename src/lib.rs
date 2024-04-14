@@ -108,31 +108,33 @@ mod tests {
             easing_function: EasingFunction::Linear,
             easing_type: EasingType::In,
         });
-        assert_eq!(tl.tracks.get_mut("test").unwrap().keyframes.len(), 1);
-        assert_eq!(tl.tracks.get_mut("test").unwrap().keyframes[0].time, Duration::from_secs(1));
-        assert_eq!(tl.tracks.get_mut("test").unwrap().keyframes[0].value, 0.0);
+        let t = tl.tracks.get("test").unwrap();
+        assert_eq!(t.keyframes.len(), 1);
+        assert_eq!(t.keyframes[0].time, Duration::from_secs(1));
+        assert_eq!(t.keyframes[0].value, 0.0);
     }
 
     #[test]
     fn new_keyframes() {
         let mut tl = Timeline::<f32>::new();
         tl.new_track::<f32>("test");
-        tl.tracks.get_mut("test").unwrap().add_keyframe(Keyframe {
+        let t = tl.tracks.get_mut("test").unwrap();
+        t.add_keyframe(Keyframe {
             time: Duration::from_secs(1),
             value: 0.0,
             easing_function: EasingFunction::Linear,
             easing_type: EasingType::In,
         });
-        tl.tracks.get_mut("test").unwrap().add_keyframe(Keyframe {
+        t.add_keyframe(Keyframe {
             time: Duration::from_secs(2),
             value: 1.0,
             easing_function: EasingFunction::Linear,
             easing_type: EasingType::In,
         });
-        assert_eq!(tl.tracks.get_mut("test").unwrap().keyframes.len(), 2);
-        assert_eq!(tl.tracks.get_mut("test").unwrap().keyframes[0].time, Duration::from_secs(1));
-        assert_eq!(tl.tracks.get_mut("test").unwrap().keyframes[1].time, Duration::from_secs(2));
-        assert_eq!(tl.tracks.get_mut("test").unwrap().keyframes[0].value, 0.0);
-        assert_eq!(tl.tracks.get_mut("test").unwrap().keyframes[1].value, 1.0);
+        assert_eq!(t.keyframes.len(), 2);
+        assert_eq!(t.keyframes[0].time, Duration::from_secs(1));
+        assert_eq!(t.keyframes[1].time, Duration::from_secs(2));
+        assert_eq!(t.keyframes[0].value, 0.0);
+        assert_eq!(t.keyframes[1].value, 1.0);
     }
 }
