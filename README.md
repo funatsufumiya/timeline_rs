@@ -14,7 +14,7 @@ My code-base is published under the WTFPL (see [LICENSE](LICENSE) file). However
 
 This work is heavily inspired by [ofxTimeline](https://github.com/YCAMInterlab/ofxTimeline), and intended to use data created by ofxTimeline.
 
-Some code-bases are ported and refectored from ofxTimeline, and some dependencies are also referenced like ofxEasing and ofxTween.
+Some code-bases are referenced from ofxTimeline, and some dependencies are also referenced like ofxEasing and ofxTween.
 
 - [ofxEasing](https://github.com/arturoc/ofxEasing), is licensed under the MIT license. see [ofxEasing's LICENSE](https://github.com/arturoc/ofxEasing/blob/master/LICENSE)
 - [ofxTween](https://github.com/arturoc/ofxTween), is licensed under the MIT license. see [ofxTween's LICENSE](https://github.com/arturoc/ofxTween/blob/master/LICENSE)
