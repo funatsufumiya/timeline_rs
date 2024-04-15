@@ -1,5 +1,6 @@
 pub mod easing;
-pub mod xml_to_json;
+pub mod loader;
+mod xml_to_json;
 
 #[cfg(feature="bevy")]
 use bevy_math::{Vec2, Vec3};
@@ -29,53 +30,24 @@ pub enum TrackVariant {
     Vec4Track(Track<(f32, f32, f32, f32)>),
 }
 
-impl From<Track<f32>> for TrackVariant {
-    fn from(track: Track<f32>) -> Self {
-        TrackVariant::FloatTrack(track)
-    }
+macro_rules! impl_from_track_variant {
+    ($tp:ident, $name:ident) => {
+        impl From<Track<$tp>> for TrackVariant {
+            fn from(track: Track<$tp>) -> Self {
+                TrackVariant::$name(track)
+            }
+        }
+    };
 }
 
-impl From<Track<f64>> for TrackVariant {
-    fn from(track: Track<f64>) -> Self {
-        TrackVariant::DoubleTrack(track)
-    }
-}
-
-impl From<Track<i32>> for TrackVariant {
-    fn from(track: Track<i32>) -> Self {
-        TrackVariant::IntTrack(track)
-    }
-}
-
-impl From<Track<bool>> for TrackVariant {
-    fn from(track: Track<bool>) -> Self {
-        TrackVariant::BoolTrack(track)
-    }
-}
-
-impl From<Track<i64>> for TrackVariant {
-    fn from(track: Track<i64>) -> Self {
-        TrackVariant::LongTrack(track)
-    }
-}
-
-impl From<Track<(f32, f32)>> for TrackVariant {
-    fn from(track: Track<(f32, f32)>) -> Self {
-        TrackVariant::Vec2Track(track)
-    }
-}
-
-impl From<Track<(f32, f32, f32)>> for TrackVariant {
-    fn from(track: Track<(f32, f32, f32)>) -> Self {
-        TrackVariant::Vec3Track(track)
-    }
-}
-
-impl From<Track<(f32, f32, f32, f32)>> for TrackVariant {
-    fn from(track: Track<(f32, f32, f32, f32)>) -> Self {
-        TrackVariant::Vec4Track(track)
-    }
-}
+impl_from_track_variant!(bool, BoolTrack);
+impl_from_track_variant!(f32, FloatTrack);
+impl_from_track_variant!(f64, DoubleTrack);
+impl_from_track_variant!(i32, IntTrack);
+impl_from_track_variant!(i64, LongTrack); 
+impl_from_track_variant!(MyVec2, Vec2Track);
+impl_from_track_variant!(MyVec3, Vec3Track);
+impl_from_track_variant!(MyVec4, Vec4Track);
 
 pub enum TrackValue {
     Bool(bool),
@@ -88,125 +60,33 @@ pub enum TrackValue {
     Vec4(MyVec4),
 }
 
-impl From<bool> for TrackValue {
-    fn from(value: bool) -> Self {
-        TrackValue::Bool(value)
-    }
-}
-
-impl From<i32> for TrackValue {
-    fn from(value: i32) -> Self {
-        TrackValue::Int(value)
-    }
-}
-
-impl From<f32> for TrackValue {
-    fn from(value: f32) -> Self {
-        TrackValue::Float(value)
-    }
-}
-
-impl From<f64> for TrackValue {
-    fn from(value: f64) -> Self {
-        TrackValue::Double(value)
-    }
-}
-
-impl From<i64> for TrackValue {
-    fn from(value: i64) -> Self {
-        TrackValue::Long(value)
-    }
-}
-
-impl From<(f32, f32)> for TrackValue {
-    fn from(value: (f32, f32)) -> Self {
-        TrackValue::Vec2(value)
-    }
-}
-
-impl From<(f32, f32, f32)> for TrackValue {
-    fn from(value: (f32, f32, f32)) -> Self {
-        TrackValue::Vec3(value)
-    }
-}
-
-impl From<(f32, f32, f32, f32)> for TrackValue {
-    fn from(value: (f32, f32, f32, f32)) -> Self {
-        TrackValue::Vec4(value)
-    }
-}
-
-impl From<TrackValue> for bool {
-    fn from(value: TrackValue) -> Self {
-        match value {
-            TrackValue::Bool(v) => v,
-            _ => panic!("Invalid conversion"),
+macro_rules! impl_from_track_value {
+    ($tp:ident, $name:ident) => {
+        impl From<$tp> for TrackValue {
+            fn from(value: $tp) -> Self {
+                TrackValue::$name(value)
+            }
         }
-    }
+
+        impl From<TrackValue> for $tp {
+            fn from(value: TrackValue) -> Self {
+                match value {
+                    TrackValue::$name(v) => v,
+                    _ => panic!("Invalid conversion"),
+                }
+            }
+        }
+    };
 }
 
-impl From<TrackValue> for i32 {
-    fn from(value: TrackValue) -> Self {
-        match value {
-            TrackValue::Int(v) => v,
-            _ => panic!("Invalid conversion"),
-        }
-    }
-}
-
-impl From<TrackValue> for f32 {
-    fn from(value: TrackValue) -> Self {
-        match value {
-            TrackValue::Float(v) => v,
-            _ => panic!("Invalid conversion"),
-        }
-    }
-}
-
-impl From<TrackValue> for f64 {
-    fn from(value: TrackValue) -> Self {
-        match value {
-            TrackValue::Double(v) => v,
-            _ => panic!("Invalid conversion"),
-        }
-    }
-}
-
-impl From<TrackValue> for i64 {
-    fn from(value: TrackValue) -> Self {
-        match value {
-            TrackValue::Long(v) => v,
-            _ => panic!("Invalid conversion"),
-        }
-    }
-}
-
-impl From<TrackValue> for (f32, f32) {
-    fn from(value: TrackValue) -> Self {
-        match value {
-            TrackValue::Vec2(v) => v,
-            _ => panic!("Invalid conversion"),
-        }
-    }
-}
-
-impl From<TrackValue> for (f32, f32, f32) {
-    fn from(value: TrackValue) -> Self {
-        match value {
-            TrackValue::Vec3(v) => v,
-            _ => panic!("Invalid conversion"),
-        }
-    }
-}
-
-impl From<TrackValue> for (f32, f32, f32, f32) {
-    fn from(value: TrackValue) -> Self {
-        match value {
-            TrackValue::Vec4(v) => v,
-            _ => panic!("Invalid conversion"),
-        }
-    }
-}
+impl_from_track_value!(bool, Bool);
+impl_from_track_value!(i32, Int);
+impl_from_track_value!(f32, Float);
+impl_from_track_value!(f64, Double);
+impl_from_track_value!(i64, Long);
+impl_from_track_value!(MyVec2, Vec2);
+impl_from_track_value!(MyVec3, Vec3);
+impl_from_track_value!(MyVec4, Vec4);
 
 pub trait TrackValueGetter {
     fn get_value(&self, time: Duration) -> TrackValue;
