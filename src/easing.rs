@@ -424,6 +424,11 @@ pub fn easing(time: f32, beginning_value: f32, changing_value: f32, duration: f3
 
 #[cfg(test)]
 mod tests {
+    use assert_float_eq::assert_float_relative_eq;
+    use assert_float_eq::afe_is_relative_eq;
+    use assert_float_eq::afe_relative_error_msg;
+    use assert_float_eq::afe_abs;
+
     use super::*;
 
     #[test]
@@ -550,5 +555,172 @@ mod tests {
         assert_eq!(f(0.5), 86.60254);
         assert_eq!(f(0.75), 96.824585);
         assert_eq!(f(1.0), 100.0);
+    }
+
+    #[test]
+    fn all_easings_in_out_has_symmetry(){
+        let easing_func_list = [
+            EasingFunction::Linear,
+            EasingFunction::Sine,
+            EasingFunction::Circular,
+            EasingFunction::Quadratic,
+            EasingFunction::Cubic,
+            EasingFunction::Quartic,
+            EasingFunction::Quintic,
+            EasingFunction::Exponential,
+            // EasingFunction::Back,
+            EasingFunction::Bounce,
+            // EasingFunction::Elastic,
+        ];
+        const precision: f32 = 0.001;
+        for easing_func in easing_func_list.iter() {
+            let f = move |t: f32| -> f32 {
+                easing(t, 0.0, 1.0, 1.0, *easing_func, EasingType::InOut)
+            };
+            assert_float_relative_eq!(f(0.0), 1.0 - f(1.0), precision);
+            assert_float_relative_eq!(f(0.25), 1.0 - f(0.75), precision);
+            assert_float_relative_eq!(f(0.3), 1.0 - f(0.7), precision);
+            assert_float_relative_eq!(f(0.5), 1.0 - f(0.5), precision);
+        }
+    }
+
+    #[test]
+    fn all_easings_out_offset_works(){
+        let easing_func_list = [
+            EasingFunction::Linear,
+            EasingFunction::Sine,
+            EasingFunction::Circular,
+            EasingFunction::Quadratic,
+            EasingFunction::Cubic,
+            EasingFunction::Quartic,
+            EasingFunction::Quintic,
+            EasingFunction::Exponential,
+            EasingFunction::Back,
+            EasingFunction::Bounce,
+            EasingFunction::Elastic,
+        ];
+
+        const precision: f32 = 0.001;
+        const start: f32 = 10.0;
+        const width: f32 = 70.0;
+        const offset: f32 = 100.0;
+        
+        for easing_func in easing_func_list.iter() {
+            let f1 = move |t: f32| -> f32 {
+                easing(t, start, width, 1.0, *easing_func, EasingType::Out)
+            };
+            let f2 = move |t: f32| -> f32 {
+                easing(t, start + offset, width, 1.0, *easing_func, EasingType::Out)
+            };
+            assert_float_relative_eq!(f1(0.0) + offset, f2(0.0), precision);
+            assert_float_relative_eq!(f1(0.25) + offset, f2(0.25), precision);
+            assert_float_relative_eq!(f1(0.5) + offset, f2(0.5), precision);
+            assert_float_relative_eq!(f1(0.75) + offset, f2(0.75), precision);
+        }
+    }
+
+    #[test]
+    fn all_easings_in_offset_works(){
+        let easing_func_list = [
+            EasingFunction::Linear,
+            EasingFunction::Sine,
+            EasingFunction::Circular,
+            EasingFunction::Quadratic,
+            EasingFunction::Cubic,
+            EasingFunction::Quartic,
+            EasingFunction::Quintic,
+            EasingFunction::Exponential,
+            EasingFunction::Back,
+            EasingFunction::Bounce,
+            EasingFunction::Elastic,
+        ];
+
+        const precision: f32 = 0.001;
+        const start: f32 = 10.0;
+        const width: f32 = 70.0;
+        const offset: f32 = 100.0;
+        
+        for easing_func in easing_func_list.iter() {
+            let f1 = move |t: f32| -> f32 {
+                easing(t, start, width, 1.0, *easing_func, EasingType::In)
+            };
+            let f2 = move |t: f32| -> f32 {
+                easing(t, start + offset, width, 1.0, *easing_func, EasingType::In)
+            };
+            assert_float_relative_eq!(f1(0.0) + offset, f2(0.0), precision);
+            assert_float_relative_eq!(f1(0.25) + offset, f2(0.25), precision);
+            assert_float_relative_eq!(f1(0.5) + offset, f2(0.5), precision);
+            assert_float_relative_eq!(f1(0.75) + offset, f2(0.75), precision);
+        }
+    }
+
+    #[test]
+    fn all_easings_in_scale_works(){
+        let easing_func_list = [
+            EasingFunction::Linear,
+            EasingFunction::Sine,
+            EasingFunction::Circular,
+            EasingFunction::Quadratic,
+            EasingFunction::Cubic,
+            EasingFunction::Quartic,
+            EasingFunction::Quintic,
+            EasingFunction::Exponential,
+            EasingFunction::Back,
+            EasingFunction::Bounce,
+            EasingFunction::Elastic,
+        ];
+
+        const precision: f32 = 0.001;
+        const start: f32 = 0.0;
+        const width: f32 = 70.0;
+        const scale: f32 = 2.0;
+
+        for easing_func in easing_func_list.iter() {
+            let f1 = move |t: f32| -> f32 {
+                easing(t, start, width, 1.0, *easing_func, EasingType::In)
+            };
+            let f2 = move |t: f32| -> f32 {
+                easing(t, start, width * scale, 1.0, *easing_func, EasingType::In)
+            };
+            assert_float_relative_eq!(f1(0.0) * scale, f2(0.0), precision);
+            assert_float_relative_eq!(f1(0.25) * scale, f2(0.25), precision);
+            assert_float_relative_eq!(f1(0.5) * scale, f2(0.5), precision);
+            assert_float_relative_eq!(f1(0.75) * scale, f2(0.75), precision);
+        }
+    }
+
+    #[test]
+    fn all_easings_out_scale_works(){
+        let easing_func_list = [
+            EasingFunction::Linear,
+            EasingFunction::Sine,
+            EasingFunction::Circular,
+            EasingFunction::Quadratic,
+            EasingFunction::Cubic,
+            EasingFunction::Quartic,
+            EasingFunction::Quintic,
+            EasingFunction::Exponential,
+            EasingFunction::Back,
+            EasingFunction::Bounce,
+            EasingFunction::Elastic,
+        ];
+
+        const precision: f32 = 0.001;
+        const start: f32 = 0.0;
+        const width: f32 = 70.0;
+        const scale: f32 = 2.0;
+
+        for easing_func in easing_func_list.iter() {
+            let f1 = move |t: f32| -> f32 {
+                easing(t, start, width, 1.0, *easing_func, EasingType::Out)
+            };
+            let f2 = move |t: f32| -> f32 {
+                easing(t, start, width * scale, 1.0, *easing_func, EasingType::Out)
+            };
+            assert_float_relative_eq!(f1(0.0) * scale, f2(0.0), precision);
+            assert_float_relative_eq!(f1(0.25) * scale, f2(0.25), precision);
+            assert_float_relative_eq!(f1(0.5) * scale, f2(0.5), precision);
+            assert_float_relative_eq!(f1(0.75) * scale, f2(0.75), precision);
+        }
     }
 }
