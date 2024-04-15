@@ -12,7 +12,7 @@ My code-base is published under the WTFPL (see [LICENSE](LICENSE) file). However
 
 ### Indirectly referenced projects
 
-This work is heavily inspired by [ofxTimeline](https://github.com/YCAMInterlab/ofxTimeline) of [YCAMInterlab](https://github.com/YCAMInterlab), not only the code, but also the concept and the spirit. And highly intended to use data created by ofxTimeline.
+This work is heavily inspired by [ofxTimeline](https://github.com/YCAMInterlab/ofxTimeline) of [YCAMInterlab](https://github.com/YCAMInterlab), not only the code, but also the concept and the spirit. And highly intended to use data created by ofxTimeline and [loaf_timeline](https://github.com/funatsufumiya/loaf_timeline/) (lua/oF scripting environment using ofxTimeline).
 
 Some code-bases are referenced from ofxTimeline, and some dependencies are also referenced like ofxEasing and ofxTween.
 
