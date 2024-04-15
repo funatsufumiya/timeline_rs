@@ -4,6 +4,16 @@
 
 This is a simple timeline library for Rust. It is designed to be used in a game engine, but can be used for any purpose.
 
+## Examples
+
+### Easing Tester
+
+![screenshot_easing_tester](screenshot_easing_tester.png)
+
+```bash
+$ cargo run --example easing_tester --features bevy_example
+```
+
 ## License Acknowledgements
 
 My code-base is published under the WTFPL (see [LICENSE](LICENSE) file). However, the dependencies of this project have different licenses.
