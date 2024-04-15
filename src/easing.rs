@@ -256,39 +256,6 @@ impl Easing for EasingExponential {
 
 pub struct EasingBack;
 impl Easing for EasingBack {
-    // original C++ code:
-
-    // inline static float easeIn_s(float t,float b , float c, float d, float s) {
-	// 	float postFix = t/=d;
-	// 	return c*(postFix)*t*((s+1)*t - s) + b;
-	// }
-
-	// inline static float easeIn (float t,float b , float c, float d) {
-	// 	return easeIn_s(t, b, c, d, 1.70158f);
-	// }
-
-	// inline static float easeOut_s(float t,float b , float c, float d, float s) {
-	// 	t=t/d-1;
-	// 	return c*(t*t*((s+1)*t + s) + 1) + b;
-	// }
-
-	// inline static float easeOut(float t,float b , float c, float d) {
-	// 	return easeOut_s(t, b, c, d, 1.70158f);
-	// }
-
-	// inline static float easeInOut_s(float t,float b , float c, float d, float s) {
-	// 	s*=(1.525f);
-	// 	if ((t/=d/2) < 1){
-	// 		return c/2*(t*t*((s+1)*t - s)) + b;
-	// 	}
-	// 	float postFix = t-=2;
-	// 	return c/2*((postFix)*t*((s+1)*t + s) + 2) + b;
-	// }
-
-	// inline static float easeInOut(float t,float b , float c, float d) {
-	// 	return easeInOut_s(t, b, c, d, 1.70158f);
-	// }
-
     fn ease(t: f32, b: f32, c: f32, d: f32, easing_type: EasingType) -> f32 {
         match easing_type {
             EasingType::In => EasingBack::ease_in_s(t, b, c, d, 1.70158),
