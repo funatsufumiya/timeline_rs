@@ -4,6 +4,8 @@
 
 This is a simple timeline library for Rust. It is designed to be used in a game engine, but can be used for any purpose.
 
+This work is heavily inspired by [ofxTimeline](https://github.com/YCAMInterlab/ofxTimeline) of [YCAMInterlab](https://github.com/YCAMInterlab), and intended to use data created by ofxTimeline and [loaf_timeline](https://github.com/funatsufumiya/loaf_timeline/) (lua/oF scripting environment using ofxTimeline).
+
 ## Examples
 
 ### Easing Tester
@@ -13,6 +15,24 @@ This is a simple timeline library for Rust. It is designed to be used in a game 
 ```bash
 $ cargo run --example easing_tester --features bevy_example
 ```
+
+### Timeline Simple
+
+![screenshot_timeline_simple](screenshot_timeline_simple.png)
+
+```bash
+$ cargo run --example timeline_simple --features bevy_example
+```
+
+### Timeline From XML
+
+![screenshot_timeline_simple](screenshot_timeline_simple.png)
+
+```bash
+$ cargo run --example timeline_from_xml --features bevy_example
+```
+
+
 
 ## License Acknowledgements
 
