@@ -8,7 +8,12 @@ This is a simple timeline library for Rust. It is designed to be used in a game 
 
 My code-base is published under the WTFPL (see [LICENSE](LICENSE) file). However, the dependencies of this project have different licenses.
 
-- `easing.rs` is ported from [ofxEasing.h](https://github.com/arturoc/ofxEasing/blob/master/src/ofxEasing.h) used in [ofxEasing](https://github.com/arturoc/ofxEasing), based on [terms of use](https://github.com/arturoc/ofxEasing/blob/master/src/easing_terms_of_use.html).
-- indirectly referenced [ofxEasing](https://github.com/arturoc/ofxEasing), is licensed under the MIT license. see [ofxEasing's LICENSE](https://github.com/arturoc/ofxEasing/blob/master/LICENSE)
-- indirectly referenced [ofxTween](https://github.com/arturoc/ofxTween), is licensed under the MIT license. see [ofxTween's LICENSE](https://github.com/arturoc/ofxTween/blob/master/LICENSE)
-- indirectly referenced [ofxTimeline](https://github.com/YCAMInterlab/ofxTimeline), is licensed under the Apache license. see [ofxTimeline's README](https://github.com/YCAMInterlab/ofxTimeline/blob/master/README.md)
+- `easing.rs` is ported from [ofxEasing.h](https://github.com/arturoc/ofxEasing/blob/master/src/ofxEasing.h) used in [ofxEasing](https://github.com/arturoc/ofxEasing), based on [terms of use](https://github.com/arturoc/ofxEasing/blob/master/src/easing_terms_of_use.html) (BSD License).
+
+### Indirectly referenced projects
+
+This work is heavily inspired by [ofxTimeline](https://github.com/YCAMInterlab/ofxTimeline), and intended to use data created by ofxTimeline.
+
+- [ofxEasing](https://github.com/arturoc/ofxEasing), is licensed under the MIT license. see [ofxEasing's LICENSE](https://github.com/arturoc/ofxEasing/blob/master/LICENSE)
+- [ofxTween](https://github.com/arturoc/ofxTween), is licensed under the MIT license. see [ofxTween's LICENSE](https://github.com/arturoc/ofxTween/blob/master/LICENSE)
+- [ofxTimeline](https://github.com/YCAMInterlab/ofxTimeline), is licensed under the Apache license. see [ofxTimeline's README](https://github.com/YCAMInterlab/ofxTimeline/blob/master/README.md)
