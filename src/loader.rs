@@ -204,7 +204,7 @@ struct KeyframeEntity<T> {
 
 #[cfg(test)]
 mod tests {
-    use crate::TrackGetter;
+    use crate::{easing::{EasingFunction, EasingType}, TrackGetter};
 
     use super::*;
 
@@ -249,5 +249,25 @@ mod tests {
 
         let track = tl.get("test").unwrap().as_float_track();
         assert_eq!(track.keyframes.len(), 5);
+
+        assert_eq!(track.keyframes[0].time, Duration::from_millis(643));
+        assert_eq!(track.keyframes[0].value, 0.585546851);
+        assert_eq!(track.keyframes[0].easing_function, EasingFunction::Linear);
+        assert_eq!(track.keyframes[0].easing_type, EasingType::In);
+
+        assert_eq!(track.keyframes[1].time, Duration::from_millis(826));
+        assert_eq!(track.keyframes[1].value, 0.141503930);
+        assert_eq!(track.keyframes[1].easing_function, EasingFunction::Cubic);
+        assert_eq!(track.keyframes[1].easing_type, EasingType::InOut);
+
+        assert_eq!(track.keyframes[2].time, Duration::from_millis(1594));
+        assert_eq!(track.keyframes[2].value, 0.443359375);
+        assert_eq!(track.keyframes[2].easing_function, EasingFunction::Sine);
+        assert_eq!(track.keyframes[2].easing_type, EasingType::Out);
+
+        assert_eq!(track.keyframes[3].time, Duration::from_millis(2033));
+        assert_eq!(track.keyframes[3].value, 0.400390625);
+        assert_eq!(track.keyframes[3].easing_function, EasingFunction::Linear);
+        assert_eq!(track.keyframes[3].easing_type, EasingType::InOut);
     }
 }
