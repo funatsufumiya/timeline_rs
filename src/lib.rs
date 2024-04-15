@@ -1,3 +1,7 @@
+pub mod easing;
+
+use easing::{EasingFunction, EasingType};
+
 use std::collections::HashMap;
 use std::time::Duration;
 
@@ -54,30 +58,6 @@ impl<T> Keyframe<T> {
             easing_type: EasingType::In,
         }
     }
-}
-
-#[derive(Debug, Default)]
-pub enum EasingFunction {
-    #[default]
-    Linear,
-    Sine,
-    Circular,
-    Quadratic,
-    Cubic,
-    Quartic,
-    Quintic,
-    Exponential,
-    Back,
-    Bounce,
-    Elastic
-}
-
-#[derive(Debug, Default)]
-pub enum EasingType {
-    #[default]
-    In,
-    Out,
-    InOut
 }
 
 #[cfg(test)]
