@@ -108,7 +108,7 @@ impl Easing for EasingCircular {
             }
             EasingType::Out => {
                 let m = t / d - 1.0;
-                c * (1.0 - (m * m).sqrt()) + b
+                c * (1.0 - (m * m)).sqrt() + b
             }
             EasingType::InOut => {
                 let m = t / d / 2.0;
@@ -484,6 +484,32 @@ mod tests {
         assert_eq!(f(0.25), 14.644662);
         assert_eq!(f(0.5), 50.0);
         assert_eq!(f(0.75), 85.35534);
+        assert_eq!(f(1.0), 100.0);
+    }
+
+    #[test]
+    fn easing_circular_test() {
+        let f = move |t: f32| -> f32 {
+            easing(t, 0.0, 100.0, 1.0, EasingFunction::Circular, EasingType::In)
+        };
+        assert_eq!(f(0.0), 0.0);
+        assert_eq!(f(0.25), 3.1754136);
+        assert_eq!(f(0.5), 13.397461);
+        assert_eq!(f(0.75), 33.85622);
+        assert_eq!(f(0.85), 47.32173);
+        assert_eq!(f(0.95), 68.77501);
+        assert_eq!(f(1.0), 100.0);
+
+        let f = move |t: f32| -> f32 {
+            easing(t, 0.0, 100.0, 1.0, EasingFunction::Circular, EasingType::Out)
+        };
+
+        assert_eq!(f(0.0), 0.0);
+        assert_eq!(f(0.1), 43.588997);
+        assert_eq!(f(0.15), 52.67827);
+        assert_eq!(f(0.25), 66.14378);
+        assert_eq!(f(0.5), 86.60254);
+        assert_eq!(f(0.75), 96.824585);
         assert_eq!(f(1.0), 100.0);
     }
 }
