@@ -18,6 +18,7 @@ struct EasingInfo {
     pub easing_type_selected_name: &'static str,
     pub t : f32,
     pub v : f32,
+    pub is_go_and_back: bool,
 }
 
 impl Default for EasingInfo {
@@ -29,6 +30,7 @@ impl Default for EasingInfo {
             easing_type_selected_name: "In",
             t: 0.0,
             v: 0.0,
+            is_go_and_back: false,
         }
     }
 }
@@ -36,12 +38,12 @@ impl Default for EasingInfo {
 fn easing_functions_list() -> Vec<(&'static str, easing::EasingFunction)> {
     vec![
         ("Linear", easing::EasingFunction::Linear),
+        ("Sine", easing::EasingFunction::Sine),
+        ("Circular", easing::EasingFunction::Circular),
         ("Quadratic", easing::EasingFunction::Quadratic),
         ("Cubic", easing::EasingFunction::Cubic),
         ("Quartic", easing::EasingFunction::Quartic),
         ("Quintic", easing::EasingFunction::Quintic),
-        ("Sine", easing::EasingFunction::Sine),
-        ("Circular", easing::EasingFunction::Circular),
         ("Exponential", easing::EasingFunction::Exponential),
         ("Back", easing::EasingFunction::Back),
         ("Bounce", easing::EasingFunction::Bounce),
@@ -78,6 +80,9 @@ fn update_egui (
     mut info: ResMut<EasingInfo>,
 ) {
     egui::Window::new("Easing").show(contexts.ctx_mut(), |ui| {
+        // display go_and_back as checkbox
+        ui.checkbox(&mut info.is_go_and_back, "Go and back");
+
         // display t as slider
         ui.add(egui::Slider::new(&mut info.t, 0.0..=1.0).text("t"));         
 
@@ -117,8 +122,16 @@ fn update(
     mut info: ResMut<EasingInfo>,
 ) {
     let duration: f32 = 1.0;
-    let s = ((time.elapsed_seconds_f64()) % (duration as f64)) as f32;
-    info.t = s;
+    if info.is_go_and_back {
+        let s = ((time.elapsed_seconds_f64()) % (duration as f64 * 2.0)) as f32;
+        info.t = s;
+        if s > duration {
+            info.t = 2.0 * duration - s;
+        }
+    } else {
+        let s = ((time.elapsed_seconds_f64()) % (duration as f64)) as f32;
+        info.t = s;
+    }
 
     info.v = easing::easing(
         info.t,
