@@ -9,6 +9,7 @@ use bevy_render::color::Color;
 #[cfg(feature="bevy")]
 use bevy_render::render_graph::DynEq;
 use easing::{EasingFunction, EasingType};
+use serde::de::DeserializeOwned;
 
 use std::any::Any;
 use std::collections::HashMap;
@@ -243,11 +244,15 @@ impl Timeline
 }
 
 #[derive(Debug)]
-pub struct Track<T> {
+pub struct Track<T>
+where T : Copy + DeserializeOwned
+{
    pub keyframes: Vec<Keyframe<T>>,
 }
 
-impl<T> Default for Track<T> {
+impl<T> Default for Track<T>
+where T : Copy + DeserializeOwned
+{
     fn default() -> Self {
         Track {
             keyframes: vec![],

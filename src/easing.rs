@@ -35,12 +35,42 @@ pub enum EasingFunction {
     Elastic = 10,
 }
 
+impl From<u8> for EasingFunction {
+    fn from(v: u8) -> Self {
+        match v {
+            0 => EasingFunction::Linear,
+            1 => EasingFunction::Sine,
+            2 => EasingFunction::Circular,
+            3 => EasingFunction::Quadratic,
+            4 => EasingFunction::Cubic,
+            5 => EasingFunction::Quartic,
+            6 => EasingFunction::Quintic,
+            7 => EasingFunction::Exponential,
+            8 => EasingFunction::Back,
+            9 => EasingFunction::Bounce,
+            10 => EasingFunction::Elastic,
+            _ => EasingFunction::Linear,
+        }
+    }
+}
+
 #[derive(Default, Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum EasingType {
     #[default]
     In = 0,
     Out = 1,
     InOut = 2,
+}
+
+impl From<u8> for EasingType {
+    fn from(v: u8) -> Self {
+        match v {
+            0 => EasingType::In,
+            1 => EasingType::Out,
+            2 => EasingType::InOut,
+            _ => EasingType::In,
+        }
+    }
 }
 
 trait Easing {
