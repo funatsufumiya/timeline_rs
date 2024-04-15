@@ -188,10 +188,12 @@ impl Easing for EasingQuartic {
             EasingType::In => c * (t / d).powi(4) + b,
             EasingType::Out => -c * ((t / d - 1.0).powi(4) - 1.0) + b,
             EasingType::InOut => {
-                if (t / d / 2.0) < 1.0 {
-                    c / 2.0 * (t / d).powi(4) + b
+                let m = t / d * 2.0;
+                if m < 1.0 {
+                    c / 2.0 * m.powi(4) + b
                 } else {
-                    -c / 2.0 * ((t / d - 2.0).powi(4) - 2.0) + b
+                    let post_fix = m - 2.0;
+                    -c / 2.0 * (post_fix.powi(4) - 2.0) + b
                 }
             }
         }
