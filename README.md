@@ -1,6 +1,6 @@
 # timeline_rs
 
-**WORK IN PROGRESS**: not completed
+**WORK IN PROGRESS**: API may change in the future!
 
 This is a simple timeline library for Rust. It is designed to be used in a game engine, but can be used for any purpose.
 

@@ -723,4 +723,32 @@ mod tests {
             assert_float_relative_eq!(f1(0.75) * scale, f2(0.75), precision);
         }
     }
+
+    /// test minus changing value
+    #[test]
+    fn easing_linear_minus_changing_value_test() {
+        let f = move |t: f32| -> f32 {
+            easing(t, 0.0, -100.0, 1.0, EasingFunction::Linear, EasingType::In)
+        };
+        assert_eq!(f(0.0), 0.0);
+        assert_eq!(f(0.5), -50.0);
+        assert_eq!(f(1.0), -100.0);
+    }
+
+    /// test minus changing value
+    #[test]
+    fn easing_circ_minus_changing_value_test() {
+        let f = move |t: f32| -> f32 {
+            easing(t, 0.0, -100.0, 1.0, EasingFunction::Circular, EasingType::In)
+        };
+        const precision: f32 = 0.001;
+        assert_float_relative_eq!(f(0.0), 0.0, precision);
+        assert_float_relative_eq!(f(0.25), -3.1754136, precision);
+        assert_float_relative_eq!(f(0.5), -13.397461, precision);
+        assert_float_relative_eq!(f(0.75), -33.85622, precision);
+        assert_float_relative_eq!(f(0.85), -47.32173, precision);
+        assert_float_relative_eq!(f(0.95), -68.77501, precision);
+        assert_float_relative_eq!(f(1.0), -100.0, precision);
+    }
+
 }
