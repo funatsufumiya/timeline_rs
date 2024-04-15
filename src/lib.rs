@@ -1,4 +1,5 @@
 pub mod easing;
+pub mod xml_to_json;
 
 use easing::{EasingFunction, EasingType};
 
