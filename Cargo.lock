@@ -3559,6 +3559,8 @@ dependencies = [
  "assert_float_eq",
  "bevy",
  "bevy_egui",
+ "bevy_math",
+ "bevy_render",
  "egui-dropdown",
  "env_logger",
  "lazy_static",

@@ -3,7 +3,7 @@ use std::time::Duration;
 use bevy::prelude::*;
 
 use bevy_egui::{egui, EguiContexts, EguiPlugin};
-use timeline::{easing::{self, EasingFunction, EasingType}, Keyframe, Timeline};
+use timeline::{easing::{self, EasingFunction, EasingType}, Keyframe, Timeline, TimelineTrack, Track};
 // use egui_dropdown::DropDownBox;
 // use lazy_static::lazy_static;
 
@@ -11,12 +11,10 @@ fn s(dur: f32) -> Duration {
     Duration::from_secs_f32(dur)
 }
 
-fn create_timeline() -> Timeline<f32> {
-    let mut tl = Timeline::<f32>::new();
-    tl.new_track::<f32>("x");
-    tl.new_track::<f32>("y");
+fn create_timeline() -> Timeline {
+    let mut tl = Timeline::new();
 
-    let tx = tl.get_track_mut("x").unwrap();
+    let mut tx = Track::<f32>::default();
     tx
         .add_keyframe(Keyframe {
             time: s(0.0),
@@ -37,7 +35,7 @@ fn create_timeline() -> Timeline<f32> {
             easing_type: EasingType::In,
         });
 
-    let ty = tl.get_track_mut("y").unwrap();
+    let mut ty = Track::<f32>::default();
     ty
         .add_keyframe(Keyframe {
             time: s(0.0),
@@ -76,12 +74,15 @@ fn create_timeline() -> Timeline<f32> {
             easing_type: EasingType::In,
         });
 
+    tl.add_track("x", tx);
+    tl.add_track("y", ty);
+
     tl
 }
 
 #[derive(Resource)]
 struct TimelineData {
-    pub timeline: Timeline<f32>,
+    pub timeline: Timeline,
     pub t : f32,
     pub x : f32,
     pub y : f32,
@@ -160,8 +161,8 @@ fn update(
         }
     }
 
-    let vx = data.timeline.get_value("x", Duration::from_secs_f32(data.t));
-    let vy = data.timeline.get_value("y", Duration::from_secs_f32(data.t));
+    let vx = data.timeline.get_value("x", Duration::from_secs_f32(data.t)).into();
+    let vy = data.timeline.get_value("y", Duration::from_secs_f32(data.t)).into();
     data.x = vx;
     data.y = vy;
 

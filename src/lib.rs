@@ -1,44 +1,291 @@
 pub mod easing;
 pub mod xml_to_json;
 
+#[cfg(feature="bevy")]
+use bevy_math::{Vec2, Vec3};
+#[cfg(feature="bevy")]
+use bevy_render::color::Color;
+#[cfg(feature="bevy")]
+use bevy_render::render_graph::DynEq;
 use easing::{EasingFunction, EasingType};
 
+use std::any::Any;
 use std::collections::HashMap;
 use std::time::Duration;
 
-#[derive(Debug, Default)]
-pub struct Timeline<T> {
-    pub tracks: HashMap<String, Track<T>>
+type MyVec2 = (f32, f32);
+type MyVec3 = (f32, f32, f32);
+type MyVec4 = (f32, f32, f32, f32);
+
+#[derive(Debug)]
+pub enum TrackVariant {
+    BoolTrack(Track<bool>),
+    IntTrack(Track<i32>),
+    FloatTrack(Track<f32>),
+    DoubleTrack(Track<f64>),
+    LongTrack(Track<i64>),
+    Vec2Track(Track<(f32, f32)>),
+    Vec3Track(Track<(f32, f32, f32)>),
+    Vec4Track(Track<(f32, f32, f32, f32)>),
 }
 
-impl<T> Timeline<T>
-where T: std::ops::Add<Output = T> + std::ops::Sub<Output = T> + std::ops::Mul<f32, Output = T> + Copy + Into<f32> + From<f32> + Into<T> + std::cmp::PartialOrd
+impl From<Track<f32>> for TrackVariant {
+    fn from(track: Track<f32>) -> Self {
+        TrackVariant::FloatTrack(track)
+    }
+}
+
+impl From<Track<f64>> for TrackVariant {
+    fn from(track: Track<f64>) -> Self {
+        TrackVariant::DoubleTrack(track)
+    }
+}
+
+impl From<Track<i32>> for TrackVariant {
+    fn from(track: Track<i32>) -> Self {
+        TrackVariant::IntTrack(track)
+    }
+}
+
+impl From<Track<bool>> for TrackVariant {
+    fn from(track: Track<bool>) -> Self {
+        TrackVariant::BoolTrack(track)
+    }
+}
+
+impl From<Track<i64>> for TrackVariant {
+    fn from(track: Track<i64>) -> Self {
+        TrackVariant::LongTrack(track)
+    }
+}
+
+impl From<Track<(f32, f32)>> for TrackVariant {
+    fn from(track: Track<(f32, f32)>) -> Self {
+        TrackVariant::Vec2Track(track)
+    }
+}
+
+impl From<Track<(f32, f32, f32)>> for TrackVariant {
+    fn from(track: Track<(f32, f32, f32)>) -> Self {
+        TrackVariant::Vec3Track(track)
+    }
+}
+
+impl From<Track<(f32, f32, f32, f32)>> for TrackVariant {
+    fn from(track: Track<(f32, f32, f32, f32)>) -> Self {
+        TrackVariant::Vec4Track(track)
+    }
+}
+
+pub enum TrackValue {
+    Bool(bool),
+    Int(i32),
+    Float(f32),
+    Double(f64),
+    Long(i64),
+    Vec2(MyVec2),
+    Vec3(MyVec3),
+    Vec4(MyVec4),
+}
+
+impl From<bool> for TrackValue {
+    fn from(value: bool) -> Self {
+        TrackValue::Bool(value)
+    }
+}
+
+impl From<i32> for TrackValue {
+    fn from(value: i32) -> Self {
+        TrackValue::Int(value)
+    }
+}
+
+impl From<f32> for TrackValue {
+    fn from(value: f32) -> Self {
+        TrackValue::Float(value)
+    }
+}
+
+impl From<f64> for TrackValue {
+    fn from(value: f64) -> Self {
+        TrackValue::Double(value)
+    }
+}
+
+impl From<i64> for TrackValue {
+    fn from(value: i64) -> Self {
+        TrackValue::Long(value)
+    }
+}
+
+impl From<(f32, f32)> for TrackValue {
+    fn from(value: (f32, f32)) -> Self {
+        TrackValue::Vec2(value)
+    }
+}
+
+impl From<(f32, f32, f32)> for TrackValue {
+    fn from(value: (f32, f32, f32)) -> Self {
+        TrackValue::Vec3(value)
+    }
+}
+
+impl From<(f32, f32, f32, f32)> for TrackValue {
+    fn from(value: (f32, f32, f32, f32)) -> Self {
+        TrackValue::Vec4(value)
+    }
+}
+
+impl From<TrackValue> for bool {
+    fn from(value: TrackValue) -> Self {
+        match value {
+            TrackValue::Bool(v) => v,
+            _ => panic!("Invalid conversion"),
+        }
+    }
+}
+
+impl From<TrackValue> for i32 {
+    fn from(value: TrackValue) -> Self {
+        match value {
+            TrackValue::Int(v) => v,
+            _ => panic!("Invalid conversion"),
+        }
+    }
+}
+
+impl From<TrackValue> for f32 {
+    fn from(value: TrackValue) -> Self {
+        match value {
+            TrackValue::Float(v) => v,
+            _ => panic!("Invalid conversion"),
+        }
+    }
+}
+
+impl From<TrackValue> for f64 {
+    fn from(value: TrackValue) -> Self {
+        match value {
+            TrackValue::Double(v) => v,
+            _ => panic!("Invalid conversion"),
+        }
+    }
+}
+
+impl From<TrackValue> for i64 {
+    fn from(value: TrackValue) -> Self {
+        match value {
+            TrackValue::Long(v) => v,
+            _ => panic!("Invalid conversion"),
+        }
+    }
+}
+
+impl From<TrackValue> for (f32, f32) {
+    fn from(value: TrackValue) -> Self {
+        match value {
+            TrackValue::Vec2(v) => v,
+            _ => panic!("Invalid conversion"),
+        }
+    }
+}
+
+impl From<TrackValue> for (f32, f32, f32) {
+    fn from(value: TrackValue) -> Self {
+        match value {
+            TrackValue::Vec3(v) => v,
+            _ => panic!("Invalid conversion"),
+        }
+    }
+}
+
+impl From<TrackValue> for (f32, f32, f32, f32) {
+    fn from(value: TrackValue) -> Self {
+        match value {
+            TrackValue::Vec4(v) => v,
+            _ => panic!("Invalid conversion"),
+        }
+    }
+}
+
+trait TrackValueGetter {
+    fn get_value(&self, time: Duration) -> TrackValue;
+    fn get_duration(&self) -> Duration;
+}
+
+impl TrackValueGetter for TrackVariant {
+    fn get_value(&self, time: Duration) -> TrackValue {
+        match self {
+            TrackVariant::BoolTrack(track) => track.get_value(time).into(),
+            TrackVariant::IntTrack(track) => track.get_value(time).into(),
+            TrackVariant::FloatTrack(track) => track.get_value(time).into(),
+            TrackVariant::DoubleTrack(track) => track.get_value(time).into(),
+            TrackVariant::LongTrack(track) => track.get_value(time).into(),
+            TrackVariant::Vec2Track(track) => track.get_value(time).into(),
+            TrackVariant::Vec3Track(track) => track.get_value(time).into(),
+            TrackVariant::Vec4Track(track) => track.get_value(time).into(),
+        }
+         
+    }
+
+    fn get_duration(&self) -> Duration {
+        match self {
+            TrackVariant::BoolTrack(track) => track.get_duration(),
+            TrackVariant::IntTrack(track) => track.get_duration(),
+            TrackVariant::FloatTrack(track) => track.get_duration(),
+            TrackVariant::DoubleTrack(track) => track.get_duration(),
+            TrackVariant::LongTrack(track) => track.get_duration(),
+            TrackVariant::Vec2Track(track) => track.get_duration(),
+            TrackVariant::Vec3Track(track) => track.get_duration(),
+            TrackVariant::Vec4Track(track) => track.get_duration(),
+        }
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct Timeline {
+    pub tracks: HashMap<String, TrackVariant>,
+}
+
+impl Timeline
 {
-    pub fn new() -> Timeline<T> {
+    pub fn new() -> Timeline {
         Timeline {
             tracks: HashMap::new(),
         }
     }
 
-    pub fn new_track<U>(&mut self, name: &str) {
-        self.tracks.insert(name.to_string(), Track::default());
+    pub fn new_track<T>(&mut self, name: &str)
+    where T: Into<TrackVariant> + Default
+    {
+        self.tracks.insert(name.to_string(), T::default().into());
+    }
+
+    pub fn add_track<T>(&mut self, name: &str, track: T)
+    where T: Into<TrackVariant>
+    {
+        self.tracks.insert(name.to_string(), track.into());
     }
     
-    pub fn get_track(&self, name: &str) -> Option<&Track<T>> {
-        self.tracks.get(name)
+    pub fn get_track<'a, T>(&'a self, name: &str) -> Option<&'a T>
+    where &'a T: From<&'a TrackVariant>
+    {
+        self.tracks.get(name).map(|track| track.into())
     }
 
-    pub fn get_track_mut(&mut self, name: &str) -> Option<&mut Track<T>> {
-        self.tracks.get_mut(name)
+    pub fn get_track_mut<'a, T>(&'a mut self, name: &str) -> Option<&'a mut T>
+    where &'a mut T: From<&'a mut TrackVariant>
+    {
+        self.tracks.get_mut(name).map(|track| track.into())
     }
 
-    pub fn add_track(&mut self, name: &str, track: Track<T>) {
-        self.tracks.insert(name.to_string(), track);
-    }
-
-    pub fn get_value(&self, name: &str, time: Duration) -> T {
+    pub fn get_value(&self, name: &str, time: Duration) -> TrackValue {
         self.get_track(name).unwrap().get_value(time)
     }
+
+    // pub fn get_value(&self, name: &str, time: Duration) -> T {
+    //     self.get_track(name).unwrap().get_value(time)
+    // }
 
     /// returns max duration of all tracks
     pub fn get_max_duration(&self) -> Duration {
@@ -66,18 +313,176 @@ impl<T> Default for Track<T> {
     }
 }
 
-impl<T> Track<T> 
-where T: std::ops::Add<Output = T> + std::ops::Sub<Output = T> + std::ops::Mul<f32, Output = T> + Copy + Into<f32> + From<f32> + Into<T> + std::cmp::PartialOrd
-{
-    pub fn add_keyframe(&mut self, keyframe: Keyframe<T>) -> &mut Self {
-        self.keyframes.push(keyframe);
+trait InteroperableValue<T> {
+    fn get_easing_value(
+        time: f32, start_value: T, next_value: T,
+        duration: f32, easing_function: EasingFunction, easing_type: EasingType) -> T;
+    fn get_self(&self) -> T;
+}
 
+impl InteroperableValue<f32> for f32 {
+    fn get_easing_value(
+        time: f32, start_value: f32, next_value: f32,
+        duration: f32, easing_function: EasingFunction, easing_type: EasingType) -> f32
+    {
+        easing::easing(time, start_value, next_value - start_value, duration, easing_function, easing_type)
+    }
+    
+    fn get_self(&self) -> f32 {
+        *self
+    }
+}
+
+impl InteroperableValue<f64> for f64 {
+    fn get_easing_value(
+        time: f32, start_value: f64, next_value: f64,
+        duration: f32, easing_function: EasingFunction, easing_type: EasingType) -> f64
+    {
+        easing::easing(time, start_value as f32, (next_value - start_value) as f32, duration, easing_function, easing_type) as f64
+    }
+
+    fn get_self(&self) -> f64 {
+        *self
+    }
+}
+
+impl InteroperableValue<i32> for i32 {
+    fn get_easing_value(
+        time: f32, start_value: i32, next_value: i32,
+        duration: f32, easing_function: EasingFunction, easing_type: EasingType) -> i32
+    {
+        let changing_value = next_value - start_value;
+        easing::easing(
+            time, start_value as f32, changing_value as f32, duration, easing_function, easing_type
+        ) as i32
+    }
+
+    fn get_self(&self) -> i32 {
+        *self
+    }
+}
+
+impl InteroperableValue<i64> for i64 {
+    fn get_easing_value(
+        time: f32, start_value: i64, next_value: i64,
+        duration: f32, easing_function: EasingFunction, easing_type: EasingType) -> i64
+    {
+        let changing_value = next_value - start_value;
+        easing::easing(
+            time, start_value as f32, changing_value as f32, duration, easing_function, easing_type
+        ) as i64
+    }
+
+    fn get_self(&self) -> i64 {
+        *self
+    }
+}
+
+impl InteroperableValue<bool> for bool {
+    fn get_easing_value(
+        time: f32, start_value: bool, next_value: bool,
+        duration: f32, easing_function: EasingFunction, easing_type: EasingType) -> bool
+    {
+        // WORKAROUND:
+        start_value
+    }
+
+    fn get_self(&self) -> bool {
+        *self
+    }
+}
+
+impl InteroperableValue<(f32, f32)> for (f32, f32) {
+    fn get_easing_value(
+        time: f32, start_value: (f32, f32), next_value: (f32, f32),
+        duration: f32, easing_function: EasingFunction, easing_type: EasingType) -> (f32, f32)
+    {
+        (
+            easing::easing(time, start_value.0, next_value.0 - start_value.0, duration, easing_function, easing_type),
+            easing::easing(time, start_value.1, next_value.1 - start_value.1, duration, easing_function, easing_type),
+        )
+    }
+
+    fn get_self(&self) -> (f32, f32) {
+        *self
+    }
+}
+
+impl InteroperableValue<(f32, f32, f32)> for (f32, f32, f32) {
+    fn get_easing_value(
+        time: f32, start_value: (f32, f32, f32), next_value: (f32, f32, f32),
+        duration: f32, easing_function: EasingFunction, easing_type: EasingType) -> (f32, f32, f32)
+    {
+        (
+            easing::easing(time, start_value.0, next_value.0 - start_value.0, duration, easing_function, easing_type),
+            easing::easing(time, start_value.1, next_value.1 - start_value.1, duration, easing_function, easing_type),
+            easing::easing(time, start_value.2, next_value.2 - start_value.2, duration, easing_function, easing_type),
+        )
+    }
+
+    fn get_self(&self) -> (f32, f32, f32) {
+        *self
+    }
+}
+
+impl InteroperableValue<(f32, f32, f32, f32)> for (f32, f32, f32, f32) {
+    fn get_easing_value(
+        time: f32, start_value: (f32, f32, f32, f32), next_value: (f32, f32, f32, f32),
+        duration: f32, easing_function: EasingFunction, easing_type: EasingType) -> (f32, f32, f32, f32)
+    {
+        (
+            easing::easing(time, start_value.0, next_value.0 - start_value.0, duration, easing_function, easing_type),
+            easing::easing(time, start_value.1, next_value.1 - start_value.1, duration, easing_function, easing_type),
+            easing::easing(time, start_value.2, next_value.2 - start_value.2, duration, easing_function, easing_type),
+            easing::easing(time, start_value.3, next_value.3 - start_value.3, duration, easing_function, easing_type),
+        )
+    }
+
+    fn get_self(&self) -> (f32, f32, f32, f32) {
+        *self
+    }
+}
+
+pub fn get_easing_value<T>(
+    time: f32, start_value: T, next_value: T,
+    duration: f32, easing_function: EasingFunction, easing_type: EasingType) -> T
+where T: InteroperableValue<T>
+{
+    T::get_easing_value(time, start_value.get_self(), next_value.get_self(), duration, easing_function, easing_type)
+}
+
+pub trait TimelineTrackImpl<T>  {
+    fn get_easing_value_wrap(
+        &self,
+        time: f32, start_value: T, next_value: T,
+        duration: f32, easing_function: EasingFunction, easing_type: EasingType) -> T;
+
+    fn get_keyframes(&self) -> &Vec<Keyframe<T>>;
+    fn get_keyframes_mut(&mut self) -> &mut Vec<Keyframe<T>>;
+}
+
+pub trait TimelineTrack<T> {
+    fn add_keyframe(&mut self, keyframe: Keyframe<T>) -> &mut Self;
+    fn add_keyframes(&mut self, keyframes: Vec<Keyframe<T>>) -> &mut Self;
+    fn sort_keyframes(&mut self) -> &mut Self;
+    fn get_keyframe(&self, index: usize) -> Option<&Keyframe<T>>;
+    fn get_keyframe_mut(&mut self, index: usize) -> Option<&mut Keyframe<T>>;
+    fn get_duration(&self) -> Duration;
+    fn get_value(&self, time: Duration) -> T;
+}
+
+impl<U, T> TimelineTrack<T> for U
+where
+    U: TimelineTrackImpl<T>,
+    T: Copy
+{
+    fn add_keyframe(&mut self, keyframe: Keyframe<T>) -> &mut Self {
+        self.get_keyframes_mut().push(keyframe);
         self.sort_keyframes();
-        
         self
     }
 
-    pub fn add_keyframes(&mut self, keyframes: Vec<Keyframe<T>>) -> &mut Self {
+    fn add_keyframes(&mut self, keyframes: Vec<Keyframe<T>>) -> &mut Self {
         for keyframe in keyframes {
             self.add_keyframe(keyframe);
         }
@@ -85,48 +490,47 @@ where T: std::ops::Add<Output = T> + std::ops::Sub<Output = T> + std::ops::Mul<f
         self
     }
 
-    // sort
-    pub fn sort_keyframes(&mut self) -> &mut Self {
-        self.keyframes.sort_by(|a, b| a.time.cmp(&b.time));
+    fn sort_keyframes(&mut self) -> &mut Self {
+        self.get_keyframes_mut().sort_by(|a, b| a.time.cmp(&b.time));
         self
     }
 
-    pub fn get_keyframe(&self, index: usize) -> Option<&Keyframe<T>> {
-        self.keyframes.get(index)
+    fn get_keyframe(&self, index: usize) -> Option<&Keyframe<T>> {
+        self.get_keyframes().get(index)
     }
 
-    pub fn get_keyframe_mut(&mut self, index: usize) -> Option<&mut Keyframe<T>> {
-        self.keyframes.get_mut(index)
+    fn get_keyframe_mut(&mut self, index: usize) -> Option<&mut Keyframe<T>> {
+        self.get_keyframes_mut().get_mut(index)
     }
 
-    pub fn get_duration(&self) -> Duration {
-        if self.keyframes.len() > 0 {
-            self.keyframes[self.keyframes.len() - 1].time
+    fn get_duration(&self) -> Duration {
+        if self.get_keyframes().len() > 0 {
+            self.get_keyframes()[self.get_keyframes().len() - 1].time
         } else {
             Duration::from_secs(0)
         }
     }
 
-    pub fn get_value(&self, time: Duration) -> T {
+    fn get_value(&self, time: Duration) -> T {
         let mut value = None;
         let mut prev_keyframe = None;
         let mut next_keyframe = None;
-        let n = self.keyframes.len();
+        let n = self.get_keyframes().len();
 
         if n == 0 {
             panic!("No keyframes");
         } else if n == 1 {
-            return self.keyframes[0].value;
+            return self.get_keyframes()[0].value;
         } else {
             // if before first keyframe time
-            if time < self.keyframes[0].time {
+            if time < self.get_keyframes()[0].time {
                 // WORKAROUND: return first keyframe value
-                return self.keyframes[0].value;
+                return self.get_keyframes()[0].value;
             }
         }
 
         for i in 0..n {
-            let keyframe = &self.keyframes[i];
+            let keyframe = &self.get_keyframes()[i];
             if keyframe.time == time {
                 value = Some(keyframe.value);
                 break;
@@ -136,8 +540,8 @@ where T: std::ops::Add<Output = T> + std::ops::Sub<Output = T> + std::ops::Mul<f
                 // if has next
                 if i + 1 < n {
                     // and in range
-                    if self.keyframes[i + 1].time > time {
-                        next_keyframe = Some(&self.keyframes[i + 1]);
+                    if self.get_keyframes()[i + 1].time > time {
+                        next_keyframe = Some(&self.get_keyframes()[i + 1]);
                         break;
                     }
                 } else {
@@ -164,21 +568,30 @@ where T: std::ops::Add<Output = T> + std::ops::Sub<Output = T> + std::ops::Mul<f
                     let dt = (time - prev_keyframe.time).as_secs_f32();
                     // value = Some(prev_keyframe.value + (next_keyframe.value - prev_keyframe.value) * t);
                     // use easing
-                    let v1: f32 = prev_keyframe.value.into();
-                    let v2: f32 = next_keyframe.value.into();
+                    let v1 = prev_keyframe.value;
+                    let v2 = next_keyframe.value;
                     // println!("dt, duration: {}, {}", dt, duration);
                     // println!("t: {}", time.as_secs_f32());
                     // println!("t0, t1: {}, {}", prev_keyframe.time.as_secs_f32(), next_keyframe.time.as_secs_f32());
                     // println!("v1, v2: {}, {}", v1, v2);
                     // println!("easing({}, {}, {}, {}, {:?}, {:?})", dt, v1, v2 - v1, duration, prev_keyframe.easing_function, prev_keyframe.easing_type);
-                    value = Some(easing::easing(
+                    // value = Some(easing::easing(
+                    //     dt,
+                    //     v1,
+                    //     v2 - v1,
+                    //     duration,
+                    //     prev_keyframe.easing_function,
+                    //     prev_keyframe.easing_type,
+                    // ).into());
+
+                    value = Some(self.get_easing_value_wrap(
                         dt,
                         v1,
-                        v2 - v1,
+                        v2,
                         duration,
                         prev_keyframe.easing_function,
                         prev_keyframe.easing_type,
-                    ).into());
+                    ));
                     // let v: f32 = value.unwrap().into();
                     // println!("value: {}", v);
                 }else{
@@ -189,6 +602,37 @@ where T: std::ops::Add<Output = T> + std::ops::Sub<Output = T> + std::ops::Mul<f
         value.unwrap()
     }
 }
+
+macro_rules! timeline_track_impl {
+    ($tp:ident) => {
+        impl TimelineTrackImpl<$tp> for Track<$tp> {
+            fn get_easing_value_wrap(
+                &self,
+                time: f32, start_value: $tp, next_value: $tp,
+                duration: f32, easing_function: EasingFunction, easing_type: EasingType) -> $tp
+            {
+                <$tp>::get_easing_value(time, start_value, next_value, duration, easing_function, easing_type)
+            }
+
+            fn get_keyframes(&self) -> &Vec<Keyframe<$tp>> {
+                &self.keyframes
+            }
+
+            fn get_keyframes_mut(&mut self) -> &mut Vec<Keyframe<$tp>> {
+                &mut self.keyframes
+            }
+        }
+    };
+}
+
+timeline_track_impl!(f32);
+timeline_track_impl!(f64);
+timeline_track_impl!(i32);
+timeline_track_impl!(i64);
+timeline_track_impl!(bool);
+timeline_track_impl!(MyVec2);
+timeline_track_impl!(MyVec3);
+timeline_track_impl!(MyVec4);
 
 #[derive(Debug, Default)]
 pub struct Keyframe<T> {
@@ -220,29 +664,27 @@ mod tests {
 
     #[test]
     fn new() {
-        let tl = Timeline::<f32>::new();
+        let tl = Timeline::new();
         assert_eq!(tl.tracks.len(), 0);
     }
 
     #[test]
     fn new_track() {
-        let mut tl = Timeline::<f32>::new();
-        tl.new_track::<f32>("test");
+        let mut tl = Timeline::new();
+        tl.add_track("test", Track::<f32>::default());
         assert_eq!(tl.tracks.len(), 1);
         assert_eq!(tl.tracks.contains_key("test"), true);
     }
 
     #[test]
     fn new_keyframe() {
-        let mut tl = Timeline::<f32>::new();
-        tl.new_track::<f32>("test");
-        tl.get_track_mut("test").unwrap().add_keyframe(Keyframe::<f32> {
+        let mut t = Track::<f32>::default();
+        t.add_keyframe(Keyframe::<f32> {
             time: Duration::from_secs(1),
             value: 0.0,
             easing_function: EasingFunction::Linear,
             easing_type: EasingType::In,
         });
-        let t = tl.get_track("test").unwrap();
         assert_eq!(t.keyframes.len(), 1);
         assert_eq!(t.keyframes[0].time, Duration::from_secs(1));
         assert_eq!(t.keyframes[0].value, 0.0);
@@ -250,9 +692,7 @@ mod tests {
 
     #[test]
     fn new_keyframes() {
-        let mut tl = Timeline::<f32>::new();
-        tl.new_track::<f32>("test");
-        let t = tl.get_track_mut("test").unwrap();
+        let mut t = Track::<f32>::default();
         t.add_keyframe(Keyframe {
             time: Duration::from_secs(1),
             value: 0.0,
@@ -274,9 +714,7 @@ mod tests {
 
     #[test]
     fn new_keyframes_need_sortd() {
-        let mut tl = Timeline::<f32>::new();
-        tl.new_track::<f32>("test");
-        let t = tl.get_track_mut("test").unwrap();
+        let mut t = Track::<f32>::default();
         t.add_keyframe(Keyframe {
             time: Duration::from_secs(2),
             value: 1.0,
@@ -298,9 +736,7 @@ mod tests {
 
     #[test]
     fn get_value_test() {
-        let mut tl = Timeline::<f32>::new();
-        tl.new_track::<f32>("test");
-        let t = tl.get_track_mut("test").unwrap();
+        let mut t = Track::<f32>::default();
         t.add_keyframe(Keyframe {
             time: Duration::from_secs(1),
             value: 0.0,
@@ -319,10 +755,33 @@ mod tests {
     }
 
     #[test]
+    fn get_value_from_timeline_test() {
+        let mut tl = Timeline::new();
+        let mut t = Track::<f32>::default();
+        t.add_keyframe(Keyframe {
+            time: Duration::from_secs(1),
+            value: 0.0,
+            easing_function: EasingFunction::Linear,
+            easing_type: EasingType::In,
+        });
+        t.add_keyframe(Keyframe {
+            time: Duration::from_secs(2),
+            value: 1.0,
+            easing_function: EasingFunction::Linear,
+            easing_type: EasingType::In,
+        });
+        tl.add_track("test", t);
+        let v: f32 = tl.get_value("test", Duration::from_secs(1)).into();
+        assert_eq!(v, 0.0);
+        let v: f32 = tl.get_value("test", Duration::from_secs(2)).into();
+        assert_eq!(v, 1.0);
+        let v: f32 = tl.get_value("test", Duration::from_secs(1) + Duration::from_millis(500)).into();
+        assert_eq!(v, 0.5);
+    }
+
+    #[test]
     fn get_duration_test () {
-        let mut tl = Timeline::<f32>::new();
-        tl.new_track::<f32>("test");
-        let t = tl.get_track_mut("test").unwrap();
+        let mut t = Track::<f32>::default();
         t.add_keyframe(Keyframe {
             time: Duration::from_secs(1),
             value: 0.0,
@@ -340,9 +799,7 @@ mod tests {
 
     #[test]
     fn get_value_exceeded_duration_test() {
-        let mut tl = Timeline::<f32>::new();
-        tl.new_track::<f32>("test");
-        let t = tl.get_track_mut("test").unwrap();
+        let mut t = Track::<f32>::default();
         t.add_keyframe(Keyframe {
             time: Duration::from_secs(1),
             value: 0.0,
@@ -361,9 +818,7 @@ mod tests {
 
     #[test]
     fn get_value_before_zero_test() {
-        let mut tl = Timeline::<f32>::new();
-        tl.new_track::<f32>("test");
-        let t = tl.get_track_mut("test").unwrap();
+        let mut t = Track::<f32>::default();
         t.add_keyframe(Keyframe {
             time: Duration::from_secs(1),
             value: 0.0,
@@ -381,9 +836,7 @@ mod tests {
 
     #[test]
     fn get_value_easing_sine_test() {
-        let mut tl = Timeline::<f32>::new();
-        tl.new_track::<f32>("test");
-        let t = tl.get_track_mut("test").unwrap();
+        let mut t = Track::<f32>::default();
         t.add_keyframe(Keyframe {
             time: Duration::from_secs(1),
             value: 0.0,
