@@ -208,7 +208,7 @@ impl From<TrackValue> for (f32, f32, f32, f32) {
     }
 }
 
-trait TrackValueGetter {
+pub trait TrackValueGetter {
     fn get_value(&self, time: Duration) -> TrackValue;
     fn get_duration(&self) -> Duration;
 }
@@ -242,6 +242,68 @@ impl TrackValueGetter for TrackVariant {
     }
 }
 
+pub trait TrackGetter {
+    fn as_float_track(&self) -> &Track<f32>;
+    fn as_int_track(&self) -> &Track<i32>;
+    fn as_bool_track(&self) -> &Track<bool>;
+    fn as_double_track(&self) -> &Track<f64>;
+    fn as_long_track(&self) -> &Track<i64>;
+    fn as_vec2_track(&self) -> &Track<MyVec2>;
+    fn as_vec3_track(&self) -> &Track<MyVec3>;
+    fn as_vec4_track(&self) -> &Track<MyVec4>;
+
+    fn as_float_truck_mut(&mut self) -> &mut Track<f32>;
+    fn as_int_track_mut(&mut self) -> &mut Track<i32>;
+    fn as_bool_track_mut(&mut self) -> &mut Track<bool>;
+    fn as_double_track_mut(&mut self) -> &mut Track<f64>;
+    fn as_long_track_mut(&mut self) -> &mut Track<i64>;
+    fn as_vec2_track_mut(&mut self) -> &mut Track<MyVec2>;
+    fn as_vec3_track_mut(&mut self) -> &mut Track<MyVec3>;
+    fn as_vec4_track_mut(&mut self) -> &mut Track<MyVec4>;
+}
+
+macro_rules! track_getter_method {
+    ($id:ident, $tp:ident, $id2:ident) => {
+        fn $id(&self) -> &Track<$tp> {
+            match self {
+                TrackVariant::$id2(track) => track,
+                _ => panic!("Invalid conversion"),
+            }
+        } 
+    };
+}
+
+macro_rules! track_getter_mut_method {
+    ($id:ident, $tp:ident, $id2:ident) => {
+        fn $id(&mut self) -> &mut Track<$tp> {
+            match self {
+                TrackVariant::$id2(track) => track,
+                _ => panic!("Invalid conversion"),
+            }
+        } 
+    };
+}
+
+impl TrackGetter for TrackVariant {
+    track_getter_method!(as_float_track, f32, FloatTrack);
+    track_getter_method!(as_int_track, i32, IntTrack);
+    track_getter_method!(as_bool_track, bool, BoolTrack);
+    track_getter_method!(as_double_track, f64, DoubleTrack);
+    track_getter_method!(as_long_track, i64, LongTrack);
+    track_getter_method!(as_vec2_track, MyVec2, Vec2Track);
+    track_getter_method!(as_vec3_track, MyVec3, Vec3Track);
+    track_getter_method!(as_vec4_track, MyVec4, Vec4Track);
+
+    track_getter_mut_method!(as_float_truck_mut, f32, FloatTrack);
+    track_getter_mut_method!(as_int_track_mut, i32, IntTrack);
+    track_getter_mut_method!(as_bool_track_mut, bool, BoolTrack);
+    track_getter_mut_method!(as_double_track_mut, f64, DoubleTrack);
+    track_getter_mut_method!(as_long_track_mut, i64, LongTrack);
+    track_getter_mut_method!(as_vec2_track_mut, MyVec2, Vec2Track);
+    track_getter_mut_method!(as_vec3_track_mut, MyVec3, Vec3Track);
+    track_getter_mut_method!(as_vec4_track_mut, MyVec4, Vec4Track);
+}
+
 #[derive(Debug, Default)]
 pub struct Timeline {
     pub tracks: HashMap<String, TrackVariant>,
@@ -255,32 +317,32 @@ impl Timeline
         }
     }
 
-    pub fn new_track<T>(&mut self, name: &str)
-    where T: Into<TrackVariant> + Default
-    {
-        self.tracks.insert(name.to_string(), T::default().into());
-    }
+    // pub fn new_track<T>(&mut self, name: &str)
+    // where T: Into<TrackVariant> + Default
+    // {
+    //     self.tracks.insert(name.to_string(), T::default().into());
+    // }
 
-    pub fn add_track<T>(&mut self, name: &str, track: T)
+    pub fn add<T>(&mut self, name: &str, track: T)
     where T: Into<TrackVariant>
     {
         self.tracks.insert(name.to_string(), track.into());
     }
     
-    pub fn get_track<'a, T>(&'a self, name: &str) -> Option<&'a T>
+    pub fn get<'a, T>(&'a self, name: &str) -> Option<&'a T>
     where &'a T: From<&'a TrackVariant>
     {
         self.tracks.get(name).map(|track| track.into())
     }
 
-    pub fn get_track_mut<'a, T>(&'a mut self, name: &str) -> Option<&'a mut T>
+    pub fn get_mut<'a, T>(&'a mut self, name: &str) -> Option<&'a mut T>
     where &'a mut T: From<&'a mut TrackVariant>
     {
         self.tracks.get_mut(name).map(|track| track.into())
     }
 
     pub fn get_value(&self, name: &str, time: Duration) -> TrackValue {
-        self.get_track(name).unwrap().get_value(time)
+        self.get(name).unwrap().get_value(time)
     }
 
     // pub fn get_value(&self, name: &str, time: Duration) -> T {
@@ -671,7 +733,7 @@ mod tests {
     #[test]
     fn new_track() {
         let mut tl = Timeline::new();
-        tl.add_track("test", Track::<f32>::default());
+        tl.add("test", Track::<f32>::default());
         assert_eq!(tl.tracks.len(), 1);
         assert_eq!(tl.tracks.contains_key("test"), true);
     }
@@ -770,7 +832,7 @@ mod tests {
             easing_function: EasingFunction::Linear,
             easing_type: EasingType::In,
         });
-        tl.add_track("test", t);
+        tl.add("test", t);
         let v: f32 = tl.get_value("test", Duration::from_secs(1)).into();
         assert_eq!(v, 0.0);
         let v: f32 = tl.get_value("test", Duration::from_secs(2)).into();
