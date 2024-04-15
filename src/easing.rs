@@ -108,12 +108,12 @@ impl Easing for EasingCircular {
             }
             EasingType::Out => {
                 let m = t / d - 1.0;
-                c * (1.0 - (m * m)).sqrt() + b
+                c * (1.0 - m * m).sqrt() + b
             }
             EasingType::InOut => {
-                let m = t / d / 2.0;
+                let m = t / d * 2.0;
                 if m < 1.0 {
-                    c / 2.0 * (1.0 - (1.0 - m * m).sqrt()) + b
+                    -c / 2.0 * ((1.0 - m * m).sqrt() - 1.0) + b
                 } else {
                     let post_fix = m - 2.0;
                     c / 2.0 * ((1.0 - post_fix * post_fix).sqrt() + 1.0) + b
@@ -129,11 +129,33 @@ impl Easing for EasingQuadratic {
         match easing_type {
             EasingType::In => c * (t / d).powi(2) + b,
             EasingType::Out => -c * (t / d) * (t / d - 2.0) + b,
+            // original C++ code:
+            // inline static float easeInOut(float t,float b , float c, float d) {
+            //     if ((t/=d/2) < 1) return c/2*t*t + b;
+            //     return -c/2 * ((--t)*(t-2) - 1) + b;
+            // 
+            //     /*
+            // 
+            //     originally return -c/2 * (((t-2)*(--t)) - 1) + b;
+            //
+            //     I've had to swap (--t)*(t-2) due to diffence in behaviour in
+            //     pre-increment operators between java and c++, after hours
+            //     of joy
+            //
+            //      James George:: The fix refered to above actually broke the equation,
+            //      it would land at 50% all the time at the end
+            //      copying back the original equation from online fixed it...
+            //
+            //      potentially compiler dependent.
+            // */
+            // }
             EasingType::InOut => {
-                if (t / d / 2.0) < 1.0 {
-                    c / 2.0 * (t / d).powi(2) + b
+                let m = t / d * 2.0;
+                if m < 1.0 {
+                    c / 2.0 * m * m + b
                 } else {
-                    -c / 2.0 * ((t / d - 2.0) * (t / d - 2.0) - 1.0) + b
+                    let post_fix = m - 1.0;
+                    -c / 2.0 * (post_fix * (post_fix - 2.0) - 1.0) + b
                 }
             }
         }
