@@ -207,10 +207,12 @@ impl Easing for EasingQuintic {
             EasingType::In => c * (t / d).powi(5) + b,
             EasingType::Out => c * ((t / d - 1.0).powi(5) + 1.0) + b,
             EasingType::InOut => {
-                if (t / d / 2.0) < 1.0 {
-                    c / 2.0 * (t / d).powi(5) + b
+                let m = t / d * 2.0;
+                if m < 1.0 {
+                    c / 2.0 * m.powi(5) + b
                 } else {
-                    c / 2.0 * ((t / d - 2.0).powi(5) + 2.0) + b
+                    let post_fix = m - 2.0;
+                    c / 2.0 * (post_fix.powi(5) + 2.0) + b
                 }
             }
         }
@@ -254,28 +256,70 @@ impl Easing for EasingExponential {
 
 pub struct EasingBack;
 impl Easing for EasingBack {
+    // original C++ code:
+
+    // inline static float easeIn_s(float t,float b , float c, float d, float s) {
+	// 	float postFix = t/=d;
+	// 	return c*(postFix)*t*((s+1)*t - s) + b;
+	// }
+
+	// inline static float easeIn (float t,float b , float c, float d) {
+	// 	return easeIn_s(t, b, c, d, 1.70158f);
+	// }
+
+	// inline static float easeOut_s(float t,float b , float c, float d, float s) {
+	// 	t=t/d-1;
+	// 	return c*(t*t*((s+1)*t + s) + 1) + b;
+	// }
+
+	// inline static float easeOut(float t,float b , float c, float d) {
+	// 	return easeOut_s(t, b, c, d, 1.70158f);
+	// }
+
+	// inline static float easeInOut_s(float t,float b , float c, float d, float s) {
+	// 	s*=(1.525f);
+	// 	if ((t/=d/2) < 1){
+	// 		return c/2*(t*t*((s+1)*t - s)) + b;
+	// 	}
+	// 	float postFix = t-=2;
+	// 	return c/2*((postFix)*t*((s+1)*t + s) + 2) + b;
+	// }
+
+	// inline static float easeInOut(float t,float b , float c, float d) {
+	// 	return easeInOut_s(t, b, c, d, 1.70158f);
+	// }
+
     fn ease(t: f32, b: f32, c: f32, d: f32, easing_type: EasingType) -> f32 {
         match easing_type {
-            EasingType::In => {
-                let s = 1.70158;
-                c * (t / d) * t * ((s + 1.0) * t - s) + b
-            }
-            EasingType::Out => {
-                let s = 1.70158;
-                let t = t / d - 1.0;
-                c * (t * t * ((s + 1.0) * t + s) + 1.0) + b
-            }
-            EasingType::InOut => {
-                let s = 1.70158 * 1.525;
-                if (t / d / 2.0) < 1.0 {
-                    c / 2.0 * (t * t * ((s + 1.0) * t - s)) + b
-                } else {
-                    let post_fix = t - 2.0;
-                    c / 2.0 * ((post_fix) * t * ((s + 1.0) * t + s) + 2.0) + b
-                }
-            }
+            EasingType::In => EasingBack::ease_in_s(t, b, c, d, 1.70158),
+            EasingType::Out => EasingBack::ease_out_s(t, b, c, d, 1.70158),
+            EasingType::InOut => EasingBack::ease_in_out_s(t, b, c, d, 1.70158),
         }
     }
+}
+
+impl EasingBack {
+    fn ease_in_s(t: f32, b: f32, c: f32, d: f32, s: f32) -> f32 {
+        let post_fix = t / d;
+        c * post_fix * post_fix * ((s + 1.0) * post_fix - s) + b
+    }
+
+    fn ease_out_s(t: f32, b: f32, c: f32, d: f32, s: f32) -> f32 {
+        let post_fix = t / d - 1.0;
+        c * (post_fix * post_fix * ((s + 1.0) * post_fix + s) + 1.0) + b
+    }
+
+    fn ease_in_out_s(t: f32, b: f32, c: f32, d: f32, s: f32) -> f32 {
+        let s = s * 1.525;
+        let m = t / d * 2.0;
+        if m < 1.0 {
+            c / 2.0 * m * m * ((s + 1.0) * m - s) + b
+        } else {
+            let post_fix = m - 2.0;
+            c / 2.0 * (post_fix * post_fix * ((s + 1.0) * post_fix + s) + 2.0) + b
+        }
+    }
+    
 }
 
 pub struct EasingBounce;
