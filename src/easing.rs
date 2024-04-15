@@ -169,10 +169,12 @@ impl Easing for EasingCubic {
             EasingType::In => c * (t / d).powi(3) + b,
             EasingType::Out => c * ((t / d - 1.0).powi(3) + 1.0) + b,
             EasingType::InOut => {
-                if (t / d / 2.0) < 1.0 {
-                    c / 2.0 * (t / d).powi(3) + b
+                let m = t / d * 2.0;
+                if m < 1.0 {
+                    c / 2.0 * m.powi(3) + b
                 } else {
-                    c / 2.0 * ((t / d - 2.0).powi(3) + 2.0) + b
+                    let post_fix = m - 2.0;
+                    c / 2.0 * (post_fix.powi(3) + 2.0) + b
                 }
             }
         }
@@ -232,14 +234,16 @@ impl Easing for EasingExponential {
                 }
             }
             EasingType::InOut => {
+                let m = t / d * 2.0;
                 if t == 0.0 {
                     b
                 } else if t == d {
                     b + c
-                } else if (t / d / 2.0) < 1.0 {
-                    c / 2.0 * 2.0f32.powf(10.0 * (t / d - 1.0)) + b
+                } else if m < 1.0 {
+                    c / 2.0 * 2.0f32.powf(10.0 * (m - 1.0)) + b
                 } else {
-                    c / 2.0 * (-2.0f32.powf(-10.0 * t / d) + 2.0) + b
+                    let post_fix = m - 1.0;
+                    c / 2.0 * (-2.0f32.powf(-10.0 * post_fix / d) + 2.0) + b
                 }
             }
         }
