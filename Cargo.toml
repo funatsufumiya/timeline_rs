@@ -2,6 +2,8 @@
 name = "timeline"
 version = "0.1.0"
 edition = "2021"
+description = "simple timeline library for Rust"
+license = "WTFPL"
 
 [features]
 default = []
