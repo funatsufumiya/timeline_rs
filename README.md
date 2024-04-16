@@ -1,5 +1,9 @@
 # timeline_rs
 
+[![Crates.io](https://img.shields.io/crates/v/timeline_rs)](https://crates.io/crates/timeline_rs)
+[![Docs.rs](https://docs.rs/timeline_rs/badge.svg)](https://docs.rs/timeline_rs)
+[![License](https://img.shields.io/crates/l/timeline_rs)](LICENSE)
+
 **WORK IN PROGRESS**: API may change in the future!
 
 This is a simple timeline library for Rust. It is designed to be used in a game engine, but can be used for any purpose.
