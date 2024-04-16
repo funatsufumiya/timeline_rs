@@ -3,7 +3,7 @@ use std::time::Duration;
 use bevy::prelude::*;
 
 use bevy_egui::{egui, EguiContexts, EguiPlugin};
-use timeline::{easing::{self, EasingFunction, EasingType}, loader::TimelineXMLLoader, Keyframe, Timeline, TimelineTrack, Track, TrackGetter};
+use timeline_rs::{easing::{self, EasingFunction, EasingType}, loader::TimelineXMLLoader, Keyframe, Timeline, TimelineTrack, Track, TrackGetter};
 // use egui_dropdown::DropDownBox;
 // use lazy_static::lazy_static;
 
