@@ -13,5 +13,5 @@ fn main() {
     std::env::set_var("RUST_LOG", "info");
     env_logger::init();
 
-    error!("Error: This example requires the `bevy_example` feature to be enabled.");
+    error!("Error: This example requires `--features bevy_example`");
 }

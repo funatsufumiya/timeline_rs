@@ -3,11 +3,11 @@ pub mod loader;
 mod xml_to_json;
 
 #[cfg(feature="bevy")]
-use bevy_math::{Vec2, Vec3};
+use bevy::math::{Vec2, Vec3};
 #[cfg(feature="bevy")]
-use bevy_render::color::Color;
+use bevy::render::color::Color;
 #[cfg(feature="bevy")]
-use bevy_render::render_graph::DynEq;
+use bevy::render::render_graph::DynEq;
 use easing::{EasingFunction, EasingType};
 use serde::de::DeserializeOwned;
 
