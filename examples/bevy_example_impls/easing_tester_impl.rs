@@ -2,7 +2,6 @@ use bevy::{prelude::*, tasks::ParallelSlice};
 
 use bevy_egui::{egui, EguiContexts, EguiPlugin};
 use timeline_rs::easing;
-use egui_dropdown::DropDownBox;
 use lazy_static::lazy_static;
 
 lazy_static! {
