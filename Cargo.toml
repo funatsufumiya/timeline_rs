@@ -1,9 +1,9 @@
 [package]
 name = "timeline_rs"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 description = "simple timeline library for Rust"
-license = "WTFPL"
+license = "WTFPL OR 0BSD"
 repository = "https://github.com/funatsufumiya/timeline_rs"
 
 [features]
