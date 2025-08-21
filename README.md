@@ -92,6 +92,7 @@ tl.load_xml_str::<f32>("x", xml_x).unwrap();
 let x: f32 = tl.get_value("x", Duration::from_secs_f32(data.t)).into();
 ```
 
+NOTE: You can also parse JSON using `tl.load_json_str`, and also directly from file (`load_xml`, `load_json`.)
 
 ## License Acknowledgements
 
