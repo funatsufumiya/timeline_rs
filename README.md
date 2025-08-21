@@ -48,10 +48,10 @@ fn easing_type_list() -> Vec<(&'static str, easing::EasingType)> {
 /// ...
 
 let v: f32 = easing::easing(
-    t,
+    t, // f32: time
     0.0, // output min value
     1.0, // output diff value = (max - min)
-    duration,
+    duration, // f32
     easing_function, // for example: easing::EasingFunction::Sine
     easing_type, // for example: easing::EasingType::Out
 );
