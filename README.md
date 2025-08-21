@@ -18,6 +18,45 @@ This work is heavily inspired by [ofxTimeline](https://github.com/YCAMInterlab/o
 $ cargo run --example easing_tester --features bevy_example
 ```
 
+```
+use timeline_rs::easing;
+
+fn easing_functions_list() -> Vec<(&'static str, easing::EasingFunction)> {
+    vec![
+        ("Linear", easing::EasingFunction::Linear),
+        ("Sine", easing::EasingFunction::Sine),
+        ("Circular", easing::EasingFunction::Circular),
+        ("Quadratic", easing::EasingFunction::Quadratic),
+        ("Cubic", easing::EasingFunction::Cubic),
+        ("Quartic", easing::EasingFunction::Quartic),
+        ("Quintic", easing::EasingFunction::Quintic),
+        ("Exponential", easing::EasingFunction::Exponential),
+        ("Back", easing::EasingFunction::Back),
+        ("Bounce", easing::EasingFunction::Bounce),
+        ("Elastic", easing::EasingFunction::Elastic),
+    ]
+}
+
+fn easing_type_list() -> Vec<(&'static str, easing::EasingType)> {
+    vec![
+        ("In", easing::EasingType::In),
+        ("Out", easing::EasingType::Out),
+        ("InOut", easing::EasingType::InOut),
+    ]
+}
+
+/// ...
+
+let v: f32 = easing::easing(
+    t,
+    0.0,
+    1.0,
+    duration,
+    easing_function,
+    easing_type,
+);
+```
+
 ### Timeline Simple
 
 ![screenshot_timeline_simple](screenshot_timeline_simple.png)
