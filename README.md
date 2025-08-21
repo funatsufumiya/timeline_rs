@@ -18,7 +18,7 @@ This work is heavily inspired by [ofxTimeline](https://github.com/YCAMInterlab/o
 $ cargo run --example easing_tester --features bevy_example
 ```
 
-```
+```rust
 use timeline_rs::easing;
 
 fn easing_functions_list() -> Vec<(&'static str, easing::EasingFunction)> {
