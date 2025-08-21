@@ -44,9 +44,9 @@ My code-base is published under WTFPL and/or 0BSD (see [LICENSE_WTFPL](./LICENSE
 
 - `easing.rs` is ported from [ofxEasing.h](https://github.com/arturoc/ofxEasing/blob/master/src/ofxEasing.h) used in [ofxEasing](https://github.com/arturoc/ofxEasing), based on [terms of use](https://github.com/arturoc/ofxEasing/blob/master/src/easing_terms_of_use.html) (BSD License).
 
-### Indirectly referenced projects
+### Referenced projects
 
-This work is heavily inspired by [ofxTimeline](https://github.com/YCAMInterlab/ofxTimeline) of [YCAMInterlab](https://github.com/YCAMInterlab), not only the code, but also the concept and the spirit. And highly intended to use data created by ofxTimeline and [loaf_timeline](https://github.com/funatsufumiya/loaf_timeline/) (lua/oF scripting environment using ofxTimeline).
+This lib is created to use data of [ofxTimeline](https://github.com/YCAMInterlab/ofxTimeline) of [YCAMInterlab](https://github.com/YCAMInterlab) and [loaf_timeline](https://github.com/funatsufumiya/loaf_timeline/) (lua/oF scripting environment using ofxTimeline).
 
 Some code-bases are referenced from ofxTimeline, and some dependencies are also referenced like ofxEasing and ofxTween.
 
