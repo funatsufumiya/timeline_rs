@@ -4,8 +4,6 @@
 [![Docs.rs](https://docs.rs/timeline_rs/badge.svg)](https://docs.rs/timeline_rs)
 [![License](https://img.shields.io/crates/l/timeline_rs)](LICENSE)
 
-**WORK IN PROGRESS**: API may change in the future!
-
 This is a simple timeline library for Rust. It is designed to be used in a game engine, but can be used for any purpose.
 
 This work is heavily inspired by [ofxTimeline](https://github.com/YCAMInterlab/ofxTimeline) of [YCAMInterlab](https://github.com/YCAMInterlab), and intended to use data created by ofxTimeline and [loaf_timeline](https://github.com/funatsufumiya/loaf_timeline/) (lua/oF scripting environment using ofxTimeline).
