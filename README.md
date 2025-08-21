@@ -26,6 +26,37 @@ $ cargo run --example easing_tester --features bevy_example
 $ cargo run --example timeline_simple --features bevy_example
 ```
 
+```rust
+let mut tl = Timeline::new();
+
+let mut tx = Track::<f32>::default();
+tx
+    .add_keyframe(Keyframe {
+        time: s(0.0),
+        value: 0.0,
+        easing_function: EasingFunction::Quintic,
+        easing_type: EasingType::In,
+    })
+    .add_keyframe(Keyframe {
+        time: s(1.0),
+        value: 0.5,
+        easing_function: EasingFunction::Bounce,
+        easing_type: EasingType::Out,
+    })
+    .add_keyframe(Keyframe {
+        time: s(2.0),
+        value: 1.0,
+        easing_function: EasingFunction::Linear,
+        easing_type: EasingType::In,
+    });
+
+tl.add("x", tx);
+
+/// ...
+
+let x: f32 = tl.get_value("x", Duration::from_secs_f32(data.t)).into();
+```
+
 ### Timeline From XML
 
 ![screenshot_timeline_simple](screenshot_timeline_simple.png)
@@ -34,6 +65,32 @@ $ cargo run --example timeline_simple --features bevy_example
 $ cargo run --example timeline_from_xml --features bevy_example
 ```
 
+```rust
+let mut tl = Timeline::new();
+
+let xml_x = r#"
+    <keyframes>
+    <key>
+        <easefunc>0</easefunc>
+        <easetype>0</easetype>
+        <time>00:00:00:524</time>
+        <value>0.375000000</value>
+    </key>
+    <key>
+        <easefunc>4</easefunc>
+        <easetype>0</easetype>
+        <time>00:00:02:123</time>
+        <value>0.330175757</value>
+    </key>
+    </keyframes>
+    "#;
+
+tl.load_xml_str::<f32>("x", xml_x).unwrap();
+
+/// ...
+
+let x: f32 = tl.get_value("x", Duration::from_secs_f32(data.t)).into();
+```
 
 
 ## License Acknowledgements
