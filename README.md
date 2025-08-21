@@ -52,8 +52,8 @@ let v: f32 = easing::easing(
     0.0,
     1.0,
     duration,
-    easing_function,
-    easing_type,
+    easing_function, // for example: easing::EasingFunction::Sine
+    easing_type, // for example: easing::EasingType::Out
 );
 ```
 
