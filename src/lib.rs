@@ -459,94 +459,97 @@ where
     }
 
     fn get_value(&self, time: Duration) -> T {
-        let mut value = None;
-        let mut prev_keyframe = None;
-        let mut next_keyframe = None;
-        let n = self.get_keyframes().len();
+        #[cfg(feature = "linear_search")]
+        const USE_BINARY_SEARCH: bool = false;
+        #[cfg(not(feature = "linear_search"))]
+        const USE_BINARY_SEARCH: bool = true;
 
+        let n = self.get_keyframes().len();
         if n == 0 {
             panic!("No keyframes");
         } else if n == 1 {
             return self.get_keyframes()[0].value;
-        } else {
-            // if before first keyframe time
-            if time < self.get_keyframes()[0].time {
-                // WORKAROUND: return first keyframe value
-                return self.get_keyframes()[0].value;
-            }
+        } else if time < self.get_keyframes()[0].time {
+            return self.get_keyframes()[0].value;
         }
 
-        for i in 0..n {
-            let keyframe = &self.get_keyframes()[i];
-            if keyframe.time == time {
-                value = Some(keyframe.value);
-                break;
-            }
-            if keyframe.time < time {
-                prev_keyframe = Some(keyframe);
-                // if has next
-                if i + 1 < n {
-                    // and in range
-                    if self.get_keyframes()[i + 1].time > time {
-                        next_keyframe = Some(&self.get_keyframes()[i + 1]);
-                        break;
+        if USE_BINARY_SEARCH {
+            // Binary Search
+            
+            match self.get_keyframes().binary_search_by(|kf| kf.time.cmp(&time)) {
+                Ok(idx) => self.get_keyframes()[idx].value,
+                Err(idx) => {
+                    if idx == 0 {
+                        self.get_keyframes()[0].value
+                    } else if idx >= n {
+                        self.get_keyframes()[n - 1].value
+                    } else {
+                        let prev = &self.get_keyframes()[idx - 1];
+                        let next = &self.get_keyframes()[idx];
+                        let duration = (next.time - prev.time).as_secs_f32();
+                        let dt = (time - prev.time).as_secs_f32();
+                        self.get_easing_value_wrap(
+                            dt,
+                            prev.value,
+                            next.value,
+                            duration,
+                            prev.easing_function,
+                            prev.easing_type,
+                        )
                     }
-                } else {
-                    next_keyframe = None;
+                }
+            }
+        } else {
+            // Linear Search
+
+            let mut value = None;
+            let mut prev_keyframe = None;
+            let mut next_keyframe = None;
+            for i in 0..n {
+                let keyframe = &self.get_keyframes()[i];
+                if keyframe.time == time {
+                    value = Some(keyframe.value);
                     break;
                 }
-            }
-        }
-        if value.is_none() {
-
-            // if exceed last keyframe time
-            if next_keyframe.is_none() {
-                // WORKAROUND: return last keyframe value
-                value = Some(prev_keyframe.unwrap().value);
-
-            // if before first keyframe time
-            } else if prev_keyframe.is_none() {
-                unreachable!();
-            
-            // if normal
-            } else if let Some(prev_keyframe) = prev_keyframe {
-                if let Some(next_keyframe) = next_keyframe {
-                    let duration = (next_keyframe.time - prev_keyframe.time).as_secs_f32();
-                    let dt = (time - prev_keyframe.time).as_secs_f32();
-                    // value = Some(prev_keyframe.value + (next_keyframe.value - prev_keyframe.value) * t);
-                    // use easing
-                    let v1 = prev_keyframe.value;
-                    let v2 = next_keyframe.value;
-                    // println!("dt, duration: {}, {}", dt, duration);
-                    // println!("t: {}", time.as_secs_f32());
-                    // println!("t0, t1: {}, {}", prev_keyframe.time.as_secs_f32(), next_keyframe.time.as_secs_f32());
-                    // println!("v1, v2: {}, {}", v1, v2);
-                    // println!("easing({}, {}, {}, {}, {:?}, {:?})", dt, v1, v2 - v1, duration, prev_keyframe.easing_function, prev_keyframe.easing_type);
-                    // value = Some(easing::easing(
-                    //     dt,
-                    //     v1,
-                    //     v2 - v1,
-                    //     duration,
-                    //     prev_keyframe.easing_function,
-                    //     prev_keyframe.easing_type,
-                    // ).into());
-
-                    value = Some(self.get_easing_value_wrap(
-                        dt,
-                        v1,
-                        v2,
-                        duration,
-                        prev_keyframe.easing_function,
-                        prev_keyframe.easing_type,
-                    ));
-                    // let v: f32 = value.unwrap().into();
-                    // println!("value: {}", v);
-                }else{
-                    unreachable!();
+                if keyframe.time < time {
+                    prev_keyframe = Some(keyframe);
+                    if i + 1 < n {
+                        if self.get_keyframes()[i + 1].time > time {
+                            next_keyframe = Some(&self.get_keyframes()[i + 1]);
+                            break;
+                        }
+                    } else {
+                        next_keyframe = None;
+                        break;
+                    }
                 }
             }
+            if value.is_none() {
+                if next_keyframe.is_none() {
+                    value = Some(prev_keyframe.unwrap().value);
+                } else if prev_keyframe.is_none() {
+                    unreachable!();
+                } else if let Some(prev_keyframe) = prev_keyframe {
+                    if let Some(next_keyframe) = next_keyframe {
+                        let duration = (next_keyframe.time - prev_keyframe.time).as_secs_f32();
+                        let dt = (time - prev_keyframe.time).as_secs_f32();
+                        let v1 = prev_keyframe.value;
+                        let v2 = next_keyframe.value;
+                        value = Some(self.get_easing_value_wrap(
+                            dt,
+                            v1,
+                            v2,
+                            duration,
+                            prev_keyframe.easing_function,
+                            prev_keyframe.easing_type,
+                        ));
+                    } else {
+                        unreachable!();
+                    }
+                }
+            }
+            value.unwrap()
         }
-        value.unwrap()
     }
 }
 
