@@ -42,7 +42,7 @@ $ cargo run --example timeline_from_xml --features bevy_example
 
 My code-base is published under WTFPL and/or 0BSD (see [LICENSE_WTFPL](./LICENSE_WTFPL) and/or [LICENSE_0BSD](./LICENSE_0BSD)). However, the dependencies of this project have different licenses.
 
-- `easing.rs` is ported from [ofxEasing.h](https://github.com/arturoc/ofxEasing/blob/master/src/ofxEasing.h) used in [ofxEasing](https://github.com/arturoc/ofxEasing), based on [terms of use](https://github.com/arturoc/ofxEasing/blob/master/src/easing_terms_of_use.html) (BSD License).
+- `easing.rs` is ported from [ofxEasing.h](https://github.com/arturoc/ofxEasing/blob/master/src/ofxEasing.h) used in [ofxEasing](https://github.com/arturoc/ofxEasing), based on [terms of use](https://github.com/arturoc/ofxEasing/blob/3a15beffb9cfdce26ffafb1f78e06e730b26c239/src/easing_terms_of_use.html) (BSD License).
 
 ### Referenced projects
 
